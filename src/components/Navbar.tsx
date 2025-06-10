@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useCart } from '@/contexts/CartContext';
 
 const Navbar = () => {
+  const { totalItems } = useCart();
+
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,6 +36,9 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center gap-x-4">
+            <Link href="/cart" className="text-gray-900 hover:text-gray-500 relative mr-4">
+              Cart ({totalItems})
+            </Link>
             <Link href="/auth" className="text-gray-900 hover:text-gray-500">
               Sign In
             </Link>
