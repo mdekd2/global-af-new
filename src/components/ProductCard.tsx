@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 
 interface ProductCardProps {
@@ -15,35 +16,29 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
 
   return (
-    <div className="block bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-      <Link href={`/products/${product.id}`} className="block">
-        <div className="relative w-full h-48">
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            className="object-center"
-          />
+    <div className="border rounded-lg shadow-md overflow-hidden">
+      <div className="relative h-48">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+        <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
+        <div className="flex justify-between items-center">
+          <Link href={`/products/${product.id}`} className="text-blue-600 hover:text-blue-800">
+            View Details
+          </Link>
+          <button
+            onClick={() => addToCart(product)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add to Cart
+          </button>
         </div>
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
-            {product.name}
-          </h3>
-          <p className="mt-1 text-sm text-gray-600 line-clamp-3">
-            {product.description}
-          </p>
-          <p className="mt-2 text-xl font-bold text-gray-900">
-            ${product.price.toFixed(2)}
-          </p>
-        </div>
-      </Link>
-      <div className="p-4 pt-0">
-        <button
-          onClick={() => addToCart(product, 1)}
-          className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors duration-300"
-        >
-          Add to Cart
-        </button>
       </div>
     </div>
   );

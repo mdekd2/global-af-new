@@ -1,23 +1,20 @@
-import { db } from '@/lib/firebase';
-import {
-  doc,
+import { initializeApp } from 'firebase/app';
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  getDocs, 
   getDoc,
   setDoc,
-  collection,
-  getDocs,
-  serverTimestamp,
   query,
   orderBy,
-  limit
+  Timestamp,
+  serverTimestamp
 } from 'firebase/firestore';
+import { firebaseConfig } from '@/lib/firebase';
 
-interface UserProfile {
-  uid: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  createdAt: any; // Use ServerTimestamp for Firestore
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export interface Product {
   id: string;
@@ -25,7 +22,15 @@ export interface Product {
   description: string;
   price: number;
   imageUrl: string;
-  createdAt: any;
+  createdAt: Timestamp;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string | null;
+  photoURL: string | null;
+  createdAt: Timestamp;
 }
 
 export const createUserProfile = async (uid: string, email: string) => {
@@ -62,8 +67,6 @@ export const getProducts = async (): Promise<Product[]> => {
     products.push({ id: doc.id, ...doc.data() } as Product);
   });
 
- // ... existing code ...
-
   // If no products exist, add some dummy data for demonstration
   if (products.length === 0) {
     const dummyProducts = [
@@ -92,8 +95,6 @@ export const getProducts = async (): Promise<Product[]> => {
         createdAt: serverTimestamp()
       }
     ];
-
-// ... existing code ...
 
     for (const product of dummyProducts) {
       const productRef = doc(db, 'products', product.id);

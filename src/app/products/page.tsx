@@ -1,72 +1,57 @@
 'use client';
 
-import { getProducts, Product } from '@/lib/firestore';
+import { useEffect, useState } from 'react';
+import { Product } from '@/lib/firestore';
 import ProductCard from '@/components/ProductCard';
-import { useState, useEffect } from 'react';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState('name-asc');
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const fetchedProducts = await getProducts();
-      setProducts(fetchedProducts);
-      setFilteredProducts(fetchedProducts);
-      setLoading(false);
+      try {
+        const productsData = await fetch('/api/products').then(res => res.json());
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    let currentProducts = searchQuery === '' ? products : products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    // Apply sorting
-    const sorted = [...currentProducts].sort((a, b) => {
-      if (sortOption === 'name-asc') {
+  const sortedProducts = [...products].sort((a, b) => {
+    switch (sortOption) {
+      case 'name-asc':
         return a.name.localeCompare(b.name);
-      } else if (sortOption === 'name-desc') {
+      case 'name-desc':
         return b.name.localeCompare(a.name);
-      } else if (sortOption === 'price-asc') {
+      case 'price-asc':
         return a.price - b.price;
-      } else if (sortOption === 'price-desc') {
+      case 'price-desc':
         return b.price - a.price;
-      }
-      return 0;
-    });
-    setFilteredProducts(sorted);
-  }, [searchQuery, products, sortOption]);
+      default:
+        return 0;
+    }
+  });
 
   if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        Loading products...
-      </div>
-    );
+    return <div className="container mx-auto p-4">Loading...</div>;
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Our Products</h1>
-      <div className="mb-8 flex space-x-4">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="flex-grow p-2 border border-gray-300 rounded-md"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+    <div className="container mx-auto p-4">
+      <div className="mb-6">
+        <label htmlFor="sort" className="mr-2">Sort by:</label>
         <select
-          className="p-2 border border-gray-300 rounded-md"
+          id="sort"
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
+          className="border rounded p-2"
         >
           <option value="name-asc">Name (A-Z)</option>
           <option value="name-desc">Name (Z-A)</option>
@@ -74,15 +59,11 @@ export default function ProductsPage() {
           <option value="price-desc">Price (High to Low)</option>
         </select>
       </div>
-      {filteredProducts.length === 0 ? (
-        <p className="text-gray-600">No products found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedProducts.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
     </div>
   );
 } 

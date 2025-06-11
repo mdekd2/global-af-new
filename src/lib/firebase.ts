@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyCfHIAQ7ZpeFV_Ff92eHT_VemOgvs18Awc",
   authDomain: "gafs-e-commerce.firebaseapp.com",
   projectId: "gafs-e-commerce",

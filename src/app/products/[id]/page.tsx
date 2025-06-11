@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getProductById } from '@/lib/firestore';
 import { useCart } from '@/contexts/CartContext';
-// import Image from 'next/image'; // No longer needed
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 
 interface Product {
@@ -75,12 +75,12 @@ export default function ProductDetailPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-1/2 relative h-96">
-          <img
+        <div className="relative w-full h-96 mb-6">
+          <Image
             src={product.imageUrl}
             alt={product.name}
-            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-            className="rounded-lg shadow-md"
+            fill
+            className="object-cover rounded-lg"
           />
         </div>
         <div className="md:w-1/2">
